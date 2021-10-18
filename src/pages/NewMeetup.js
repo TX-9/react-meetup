@@ -1,6 +1,8 @@
+import { useHistory } from "react-router-dom";
 import NewMeetupForm from "../components/meetups/NewMeetupForm";
 
 function NewMeetupPage() {
+    const history = useHistory();
     function addMeetupHanlder(meetupData) {
         // 'meetups.json' firebase format
         fetch(
@@ -12,7 +14,9 @@ function NewMeetupPage() {
                     'Content-type': 'application/json'
                 }
             }
-        );
+        ).then(()=>{
+            history.replace('/');
+        });
     }
     return <section>
         <h1>Add New Meetup</h1>
