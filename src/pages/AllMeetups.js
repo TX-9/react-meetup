@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import MeetupList from "../components/meetups/MeetupList";
 
 const DUMMY_DATA = [
@@ -22,12 +23,43 @@ const DUMMY_DATA = [
   ];
 
 function AllMeetupsPage() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadedMeetups, setLoadedMeetups] = useState([]);
     
+    // callback function only runs under the certain circumstance
+    useEffect(() => {
+      setIsLoading(true);
+      fetch(
+        'https://j-meetup-default-rtdb.firebaseio.com/meetups.json')
+      .then(response => {
+        return response.json(); //parsing json to JavaScript object. 
+      }).then(data => { // because response.json() return Promise
+        const meetups = [];
+        for (const key in data) {
+          const meetup = {
+            id: key,
+            ...data[key]
+          };
+          meetups.push(meetup);
+        }
+        setIsLoading(false);
+        setLoadedMeetups(meetups);
+      });
+      // all external dependency must be included
+    }, []); // useEffect(()=>{}) is the same as use fetch without useEffect
+    // [] means only execute callback when Component renders for the first time
+    // subsequent changes by setIsLoading does not trigger callback again
+
+    if (isLoading) {
+      return <section>
+        <p>Loading...</p>
+      </section>
+    }
     return (
         <section>
             <h1>All meetups</h1>
             <ul>
-                <MeetupList meetups={DUMMY_DATA} />
+                <MeetupList meetups={loadedMeetups} />
             </ul>
         </section>
     );
